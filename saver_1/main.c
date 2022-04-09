@@ -9,6 +9,21 @@ void argv_parser(t_vars *vars, int argc, char **argv)
 	vars->time_to_sleep = ft_atoi(argv[4]) * 1000;
 }
 
+//void	is_died(t_philo *philo)
+//{
+//	t_time *temp;
+//	long	new_time;
+//	long	old_time;
+//
+//	gettimeofday(temp, NULL);
+//	old_time = philo->last_dinner->tv_sec * 1000000 + philo->last_dinner->tv_usec;
+//	new_time = temp->tv_sec * 1000000 + temp->tv_usec;
+//	if (new_time - old_time >= philo->vars->time_to_die)
+//	{
+//		printf("\n[%d] is died\n", philo->n);
+//	}
+//}
+
 void	mutex_creator(t_vars *vars)
 {
 	int	i;
@@ -41,29 +56,31 @@ void	mutex_creator(t_vars *vars)
 void *philo_func(void *data) //sega because fork
 {
 	int	i;
-	t_philo *philo;
+	
 	
 
 //	someArgs_t *arg = (someArgs_t*) args;
-	t_vars *vars = (t_vars *)data;
+	t_philo *philo = (t_philo *)data;
 //		i = vars->counter;
-	philo = &(vars->philos[]);
 
-	if (i % 2 == 0)
-		usleep(2000);
+//	if (i % 2 == 0)
+//		usleep(2000);
 	while (1)
 	{
 		pthread_mutex_lock(philo->min_fork);
-		printf("[%d] has taken a fork_1\n", i);
+		printf("[%d] has taken a fork_1\n", philo->n);
 		pthread_mutex_lock(philo->max_fork);
-		printf("[%d] has taken a fork_2\n", i);
-		printf("[%d] is eating\n", i);
-		usleep(vars->time_to_eat);
+		printf("[%d] has taken a fork_2\n", philo->n);
+		printf("[%d] is eating\n", philo->n);
+		usleep(philo->vars->time_to_eat);
 		pthread_mutex_unlock(philo->max_fork);
 		pthread_mutex_unlock(philo->min_fork);
-		printf("[%d] is sleeping\n", i);
-		usleep(vars->time_to_sleep);
-		printf("[%d] is thinking\n", i);
+//		gettimeofday(philo->last_dinner);
+//		philo->dinner_counter++;
+//		is_died(philo);
+		printf("[%d] is sleeping\n", philo->n);
+		usleep(philo->vars->time_to_sleep);
+		printf("[%d] is thinking\n", philo->n);
 
 	}
 //	sleep(10);
@@ -80,6 +97,8 @@ void attribute_forks_to_philos(t_philo *philos, t_vars *vars) //mb not left and 
 	i = 0;
 	while (i < vars->number_of_philosophers)
 	{
+		philos[i].n = i;
+		philos[i].vars = vars;
 		if (i == 0)
 		{
 			philos[i].min_fork = &(vars->forks[i]); //right fork
@@ -97,9 +116,9 @@ void attribute_forks_to_philos(t_philo *philos, t_vars *vars) //mb not left and 
 void philos_creator(t_vars *vars) //make threads
 {
 	int	ret;
+	int	i;
 
-//	i = 0;
-	vars->counter = 0;
+	i = 0;
 	vars->philos = (t_philo *)malloc(sizeof(t_philo) * vars->number_of_philosophers);
 	if (!vars->philos)
 	{
@@ -108,16 +127,16 @@ void philos_creator(t_vars *vars) //make threads
 	}
 	attribute_forks_to_philos(vars->philos, vars);
 //	printf("{%d}\n", vars->number_of_philosophers);
-	while (vars->counter < vars->number_of_philosophers)
+	while (i < vars->number_of_philosophers)
 	{
-		ret = pthread_create(&(vars->philos[vars->counter].id), NULL, philo_func, (void *)vars);
+		ret = pthread_create(&(vars->philos[i].id), NULL, philo_func, (void *)&(vars->philos[i]));
 		if (ret != 0)
 		{
 			printf("thread error: can't init\n");
 			return ;
 		}
 //		printf("{%d}\n", vars->counter);
-		vars->counter++;
+		i++;
 	}
 }
 
@@ -133,6 +152,7 @@ int main(int argc, char **argv)
 	argv_parser(&vars, argc, argv);
 	mutex_creator(&vars);
 	philos_creator(&vars);
+	
 	sleep(1000);
 
 }
