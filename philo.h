@@ -10,12 +10,17 @@
 //typedef struct timeval  time_t;
 typedef  pthread_mutex_t t_mutex;
 typedef pthread_t t_thread;
+typedef struct timeval t_time;
 
 typedef struct s_philo
 {
 	t_thread	id;
+	t_time		last_dinner;
+	int			n;
+	int			dinner_counter;
 	t_mutex *min_fork;
 	t_mutex *max_fork;
+	struct s_vars	*vars;
 	
 }				t_philo;
 
@@ -28,6 +33,7 @@ typedef struct s_vars
 	int time_to_die;
 	int time_to_eat;
 	int time_to_sleep;
+	t_time		start;
 	t_mutex *forks;
 	t_philo *philos;
 	int	counter;
