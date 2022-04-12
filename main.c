@@ -27,7 +27,7 @@ void *philo_func(void *data) //sega because fork
 //		i = vars->counter;
 //	printf("ok\n");
 //	gettimeofday(&(philo->last_dinner), NULL);
-	if (philo->n % 2 != 0)
+	if (philo->n % 2 == 0)
 		ft_sleep(1);
 	
 	while (1)

@@ -3,15 +3,16 @@
 void ft_sleep(long ms)
 {
 	t_time a;
-	long	start;
+	t_time	start;
 
-	gettimeofday(&a, NULL);
+	gettimeofday(&start, NULL);
 	ms *= 1000;
-	start = a.tv_sec * 1000000 + a.tv_usec;
+//	start = a.tv_sec * 1000 + a.tv_usec / 1000;
 	while (1)
 	{
+		usleep(1);
 		gettimeofday(&a, NULL);
-		if (a.tv_sec * 1000000 + a.tv_usec - start > ms)
+		if ((a.tv_sec - start.tv_sec) * 1000000 + (a.tv_usec - start.tv_usec) > ms)
 			break;
 	}
 }
