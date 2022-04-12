@@ -27,31 +27,32 @@ void *philo_func(void *data) //sega because fork
 //		i = vars->counter;
 //	printf("ok\n");
 //	gettimeofday(&(philo->last_dinner), NULL);
-	if (philo->n / 2 != 0)
-		ft_sleep(1);
+	if (i % 2 != 0)
+		ft_sleep(10);
 	
 	while (1)
 	{
 		pthread_mutex_lock(philo->min_fork);
 		
 		pthread_mutex_lock(&(philo->vars->print_mutex));
-		printf("{%ld}\t{%ld}\t[%d] has taken a fork_1\n", get_time_gap_from_start(philo->vars), get_time_gap_from_dinner(*philo),  philo->n + 1);
+		printf("%ld %d has taken a fork\n", get_time_gap_from_start(philo->vars), philo->n + 1);
 		pthread_mutex_unlock(&(philo->vars->print_mutex));
 		
 		pthread_mutex_lock(philo->max_fork);
 		
+		pthread_mutex_lock(&(philo->dining_mutex));
 		pthread_mutex_lock(&(philo->vars->print_mutex));
-		printf("{%ld}\t{%ld}\t[%d] has taken a fork_2\n", get_time_gap_from_start(philo->vars), get_time_gap_from_dinner(*philo), philo->n + 1);
+		printf("%ld %d has taken a fork\n", get_time_gap_from_start(philo->vars), philo->n + 1);
 		pthread_mutex_unlock(&(philo->vars->print_mutex));
 		
 		
-		pthread_mutex_lock(&(philo->dining_mutex));
+	
 			gettimeofday(&(philo->last_dinner), NULL);
 			philo->dinner_counter++;
 			pthread_mutex_unlock(&(philo->dining_mutex));
 		
 		pthread_mutex_lock(&(philo->vars->print_mutex));
-		printf("{%ld}\t{%ld}\t[%d] is eating\n", get_time_gap_from_start(philo->vars), get_time_gap_from_dinner(*philo), philo->n + 1);
+		printf("%ld %d is eating\n", get_time_gap_from_start(philo->vars), philo->n + 1);
 		pthread_mutex_unlock(&(philo->vars->print_mutex));
 		
 		ft_sleep(philo->vars->time_to_eat);
@@ -72,14 +73,14 @@ void *philo_func(void *data) //sega because fork
 //		gettimeofday(philo->last_dinner);
 		
 		pthread_mutex_lock(&(philo->vars->print_mutex));
-		printf("{%ld}\t{%ld}\t[%d] is sleeping\n", get_time_gap_from_start(philo->vars), get_time_gap_from_dinner(*philo), philo->n + 1);
+		printf("%ld %d is sleeping\n", get_time_gap_from_start(philo->vars), philo->n + 1);
 		pthread_mutex_unlock(&(philo->vars->print_mutex));
 		
 		ft_sleep(philo->vars->time_to_sleep);
 //		usleep(philo->vars->time_to_sleep * 1000);
 		
 		pthread_mutex_lock(&(philo->vars->print_mutex));
-		printf("{%ld}\t{%ld}\t[%d] is thinking\n", get_time_gap_from_start(philo->vars), get_time_gap_from_dinner(*philo), philo->n + 1);
+		printf("%ld %d is thinking\n", get_time_gap_from_start(philo->vars), philo->n + 1);
 		pthread_mutex_unlock(&(philo->vars->print_mutex));
 
 	}
@@ -105,15 +106,18 @@ void check_if_died(t_vars *vars)
 		while (i < n)
 		{
 			pthread_mutex_lock(&(vars->philos[i].dining_mutex));
+			if (vars->number_of_lunches != -1 && vars->philos[i].dinner_counter >= vars->number_of_lunches)
+			{
+				printf("\nyes!\n");
+				_exit(0);
+			}
 			if (get_time_gap_from_dinner(vars->philos[i]) > vars->time_to_die)
 			{
 				pthread_mutex_lock(&(vars->print_mutex));
-				printf("\n\n\n\n\n\n\n\n\ntime_from_last_dinner: {%ld}\n", get_time_gap_from_dinner(vars->philos[i]));
-				printf("{%ld} [%d] thread is died!!!!\n\n\n\n\n\n\n", get_time_gap_from_start(vars), i + 1);
+				printf("%ld %d died\n", get_time_gap_from_start(vars), vars->philos[i].n + 1);
 				pthread_mutex_unlock(&(vars->print_mutex));
 //				join_all_threads(vars);
-//				_exit(0);
-//				ft_sleep(10);
+				_exit(0);
 			}
 			pthread_mutex_unlock(&(vars->philos[i].dining_mutex));
 			i++;
@@ -153,19 +157,17 @@ void philos_creator(t_vars *vars) //make threads
 int main(int argc, char **argv)
 {
 	t_vars	vars;
-//	printf("getpid = %d\n\n\n", getpid());
+	printf("getpid = %d\n\n\n", getpid());
 	
-	if (argc != 5) //change with number of dining
+	if (argc != 5 && argc != 6) //change with number of dining
 	{
 		printf("problem with argc\n");
 		return (0);
 	}
 	argv_parser(&vars, argc, argv);
 	mutex_creator(&vars);
-
 	philos_creator(&vars);
-	
-	ft_sleep(vars.time_to_die);
+	ft_sleep(10);
 	check_if_died(&vars);
 	sleep(1000);
 
