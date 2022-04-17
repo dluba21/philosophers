@@ -78,12 +78,12 @@ void *philo_func(void *data) //sega because fork
 		
 	
 //		printf("\n{%d}  [%d]\n", philo->n + 1, philo->dinner_counter);
-	
+		pthread_mutex_unlock(philo->max_fork);
 //		pthread_mutex_lock(&(philo->vars->print_mutex));
 //		printf("{%ld}\t{%ld}\t[%d] put a fork_2\t\t(%d)\n", get_time_gap_from_start(philo->vars), get_time_gap_from_dinner(*philo), philo->n + 1, philo->fork_max);
 //		pthread_mutex_unlock(&(philo->vars->print_mutex));
 		pthread_mutex_unlock(philo->min_fork);
-		pthread_mutex_unlock(philo->max_fork);
+		
 //		pthread_mutex_lock(&(philo->vars->print_mutex));
 //		printf("{%ld}\t{%ld}\t[%d] put a fork_1\t\t(%d)\n", get_time_gap_from_start(philo->vars), get_time_gap_from_dinner(*philo), philo->n + 1, philo->fork_min);
 //		pthread_mutex_unlock(&(philo->vars->print_mutex));
@@ -142,7 +142,7 @@ void check_if_died(t_vars *vars)
 				printf("{%ld} [%d] thread is died!!!!\n\n\n\n\n\n\n", get_time_gap_from_start(vars), i + 1);
 				pthread_mutex_unlock(&(vars->print_mutex));
 //				join_all_threads(vars);
-				_exit(0);
+//				_exit(0);
 //				ft_sleep(10);
 			}
 			pthread_mutex_unlock(&(vars->philos[i].dining_mutex));
