@@ -45,11 +45,11 @@ typedef struct s_vars
 }				t_vars;
 
 void	mutex_creator(t_vars *vars);
-void attribute_forks_to_philos(t_philo *philos, t_vars *vars);
-void ft_sleep(long ms);
-long get_time_gap_from_start(t_vars *vars);
-long get_time_gap_from_dinner(t_philo philo);
-void argv_parser(t_vars *vars, int argc, char **argv);
+void	attribute_forks_to_philos(t_philo *philos, t_vars *vars);
+void	ft_sleep(long ms);
+long	get_time_gap_from_start(t_vars *vars);
+long	get_time_gap_from_dinner(t_philo philo);
+void	argv_parser(t_vars *vars, int argc, char **argv);
 
 
 

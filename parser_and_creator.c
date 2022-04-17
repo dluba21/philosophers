@@ -48,19 +48,25 @@ void attribute_forks_to_philos(t_philo *philos, t_vars *vars) //mb not left and 
 		philos[i].n = i;
 		philos[i].vars = vars;
 		pthread_mutex_init(&(philos[i].dining_mutex), NULL);
-		if (i == 0)
+//		if (i != 0)
+//		{
+//			philos[i].min_fork = &(vars->forks[i]); //right fork
+//			philos[i].max_fork = &(vars->forks[vars->number_of_philosophers - 1]); //left fork
+//			philos[i].fork_min = i + 1;
+//			philos[i].fork_max = vars->number_of_philosophers - 1 + 1;
+//		}
+		philos[i].min_fork = vars->forks + i; //right fork
+		philos[i].fork_min = i + 1;
+		if (i != vars->number_of_philosophers - 1)
 		{
-			philos[i].min_fork = &(vars->forks[i]); //right fork
-			philos[i].max_fork = &(vars->forks[vars->number_of_philosophers - 1]); //left fork
-			philos[i].fork_min = i + 1;
-			philos[i].fork_max = vars->number_of_philosophers - 1 + 1;
+			philos[i].max_fork = vars->forks + i + 1; //left fork
+			philos[i].fork_max = i + 1 + 1;
 		}
+
 		else
 		{
-			philos[i].min_fork = &(vars->forks[i - 1]); //left fork
-			philos[i].max_fork = &(vars->forks[i]); //right fork
-			philos[i].fork_min = i - 1 + 1;
-			philos[i].fork_max = i + 1;
+			philos[i].max_fork = vars->forks; //right fork
+			philos[i].fork_max = 1;
 		}
 		gettimeofday(&(philos[i].last_dinner), NULL);
 		i++;
