@@ -7,10 +7,9 @@ void ft_sleep(long ms)
 
 	gettimeofday(&start, NULL);
 	ms *= 1000;
-//	start = a.tv_sec * 1000 + a.tv_usec / 1000;
 	while (1)
 	{
-		usleep(1);
+		usleep(25); //change to number
 		gettimeofday(&a, NULL);
 		if ((a.tv_sec - start.tv_sec) * 1000000 + (a.tv_usec - start.tv_usec) > ms)
 			break;

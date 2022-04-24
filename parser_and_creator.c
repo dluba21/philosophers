@@ -1,15 +1,21 @@
 #include "philo.h"
 
-void argv_parser(t_vars *vars, int argc, char **argv)
+int argv_parser(t_vars *vars, int argc, char **argv)
 {
 
 	vars->number_of_philosophers = ft_atoi(argv[1]); //in milisec!!!
 	vars->time_to_die = ft_atoi(argv[2]);
 	vars->time_to_eat = ft_atoi(argv[3]);
 	vars->time_to_sleep = ft_atoi(argv[4]);
+	if (argc == 6)
+		vars->dinner_number = ft_atoi(argv[5]);
+	if (vars->number_of_philosophers < 0 || vars->time_to_die < 0 || vars->time_to_eat < 0 || vars->time_to_sleep < 0 ||
+		vars->dinner_number < 0)
+		return (1);
+	return (0);
 }
 
-void	mutex_creator(t_vars *vars)
+int	mutex_creator(t_vars *vars)
 {
 	int	i;
 	int	ret;
@@ -20,25 +26,21 @@ void	mutex_creator(t_vars *vars)
 	if (!vars->forks)
 	{
 		printf("mutex error: can't malloc\n");
-		return ; //make system like exit
+		return (1);
 	}
 	while (i < vars->number_of_philosophers)
 	{
-
 		if (pthread_mutex_init(&vars->forks[i++], NULL) != 0)
 		{
 			printf("mutex error: can't init\n");
-			return ;
+			free(vars->forks);
+			return (1);
 		}
 	}
-	
-//	for (int j = 0; i < vars->number_of_philosophers; i++)
-//	{
-//		printf("%p ", vars->forks[j]);
-//	}
+	return (0);
 }
 
-void attribute_forks_to_philos(t_philo *philos, t_vars *vars) //mb not left and right fork, mb max_fork, min_fork
+void attribute_forks_to_philos(t_philo *philos, t_vars *vars)
 {
 	int	i;
 
@@ -48,26 +50,12 @@ void attribute_forks_to_philos(t_philo *philos, t_vars *vars) //mb not left and 
 		philos[i].n = i;
 		philos[i].vars = vars;
 		pthread_mutex_init(&(philos[i].dining_mutex), NULL);
-//		if (i != 0)
-//		{
-//			philos[i].min_fork = &(vars->forks[i]); //right fork
-//			philos[i].max_fork = &(vars->forks[vars->number_of_philosophers - 1]); //left fork
-//			philos[i].fork_min = i + 1;
-//			philos[i].fork_max = vars->number_of_philosophers - 1 + 1;
-//		}
-		philos[i].min_fork = vars->forks + i; //right fork
+		philos[i].min_fork = &(vars->forks[i]);
 		philos[i].fork_min = i + 1;
 		if (i != vars->number_of_philosophers - 1)
-		{
-			philos[i].max_fork = vars->forks + i + 1; //left fork
-			philos[i].fork_max = i + 1 + 1;
-		}
-
+			philos[i].max_fork = &(vars->forks[i + 1]);
 		else
-		{
-			philos[i].max_fork = vars->forks; //right fork
-			philos[i].fork_max = 1;
-		}
+			philos[i].max_fork = &(vars->forks[0]);
 		gettimeofday(&(philos[i].last_dinner), NULL);
 		i++;
 	}

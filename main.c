@@ -41,7 +41,7 @@ void *philo_func(void *data) //sega because fork
 //		pthread_mutex_unlock(&(philo->vars->print_mutex));
 		///////////////<<<<<<<<<<<<<<<<<----------------------------
 		pthread_mutex_lock(&(philo->vars->print_mutex));
-		printf("%ld %d has taken a fork\n", get_time_gap_from_start(philo->vars), philo->n + 1);
+//		printf("%ld %d has taken a fork\n", get_time_gap_from_start(philo->vars), philo->n + 1);
 		pthread_mutex_unlock(&(philo->vars->print_mutex));
 		
 		
@@ -53,7 +53,7 @@ void *philo_func(void *data) //sega because fork
 //		pthread_mutex_unlock(&(philo->vars->print_mutex));
 		///////////////<<<<<<<<<<<<<<<<<----------------------------
 		pthread_mutex_lock(&(philo->vars->print_mutex));
-		printf("%ld %d has taken a fork\n", get_time_gap_from_start(philo->vars), philo->n + 1);
+//		printf("%ld %d has taken a fork\n", get_time_gap_from_start(philo->vars), philo->n + 1);
 		pthread_mutex_unlock(&(philo->vars->print_mutex));
 		
 		
@@ -68,7 +68,7 @@ void *philo_func(void *data) //sega because fork
 //		pthread_mutex_unlock(&(philo->vars->print_mutex));
 		///////////////<<<<<<<<<<<<<<<<<----------------------------
 		pthread_mutex_lock(&(philo->vars->print_mutex));
-		printf("%ld %d is eating\n", get_time_gap_from_start(philo->vars), philo->n + 1);
+//		printf("%ld %d is eating\n", get_time_gap_from_start(philo->vars), philo->n + 1);
 		pthread_mutex_unlock(&(philo->vars->print_mutex));
 		
 		
@@ -109,9 +109,8 @@ void *philo_func(void *data) //sega because fork
 //		pthread_mutex_unlock(&(philo->vars->print_mutex));
 //		///////////////<<<<<<<<<<<<<<<<<----------------------------
 		pthread_mutex_lock(&(philo->vars->print_mutex));
-		printf("%ld %d is thinking\n", get_time_gap_from_start(philo->vars), philo->n + 1);
+//		printf("%ld %d is thinking\n", get_time_gap_from_start(philo->vars), philo->n + 1);
 		pthread_mutex_unlock(&(philo->vars->print_mutex));
-
 	}
 //	sleep(10);
 	return (NULL);
@@ -124,11 +123,11 @@ void check_if_died(t_vars *vars)
 {
 	int	i;
 	int	n;
-//	t_time	dinner;
-//	t_time	now;
 
 	n = vars->number_of_philosophers;
 //	printf("\n\n\n%d\n\n\n", vars->time_to_die);
+	printf("[%d]\n", vars->dinner_number);
+//	printf("[%d]\n", vars->number_of_philosophers);
 	while (1)
 	{
 		i = 0;
@@ -138,12 +137,25 @@ void check_if_died(t_vars *vars)
 			if (get_time_gap_from_dinner(vars->philos[i]) > vars->time_to_die)
 			{
 				pthread_mutex_lock(&(vars->print_mutex));
-				printf("\n\n\n\n\n\n\n\n\ntime_from_last_dinner: {%ld}\n", get_time_gap_from_dinner(vars->philos[i]));
 				printf("{%ld} [%d] thread is died!!!!\n\n\n\n\n\n\n", get_time_gap_from_start(vars), i + 1);
 				pthread_mutex_unlock(&(vars->print_mutex));
 //				join_all_threads(vars);
 				_exit(0);
-//				ft_sleep(10);
+			}
+			if (vars->dinner_number > 0)
+			{
+				printf("philo [%d] = dinner [%d] not hungry [%d]\n", i + 1, vars->philos[i].dinner_counter, vars->not_hungry);
+				if (vars->philos[i].dinner_counter == vars->dinner_number)
+				{
+					printf("{%d} not hungry!\n", i + 1);
+					vars->not_hungry++;
+//					printf("[%d]\n", vars->not_hungry);
+				}
+				if (vars->not_hungry == vars->number_of_philosophers)
+				{
+					printf("all not hungry!\n");
+//					_exit(0);
+				}
 			}
 			pthread_mutex_unlock(&(vars->philos[i].dining_mutex));
 			i++;
@@ -153,7 +165,7 @@ void check_if_died(t_vars *vars)
 
 
 
-void philos_creator(t_vars *vars) //make threads
+int philos_creator(t_vars *vars) //make threads
 {
 	int	ret;
 	int	i;
@@ -163,7 +175,7 @@ void philos_creator(t_vars *vars) //make threads
 	if (!vars->philos)
 	{
 		printf("thread creating error: can't malloc\n");
-		return ; //make system like exit
+		return (1);
 	}
 	attribute_forks_to_philos(vars->philos, vars);
 	gettimeofday(&(vars->start), NULL);
@@ -173,11 +185,11 @@ void philos_creator(t_vars *vars) //make threads
 		if (ret != 0)
 		{
 			printf("thread error: can't init\n");
-			return ;
+			return (1);
 		}
-//		printf("{%d}\n", vars->counter);
 		i++;
 	}
+	return (0);
 }
 
 int main(int argc, char **argv)
@@ -185,23 +197,24 @@ int main(int argc, char **argv)
 	t_vars	vars;
 //	printf("getpid = %d\n\n\n", getpid());
 	
-	if (argc != 5) //change with number of dining
+	if (argc != 5 && argc != 6) //change with number of dining
 	{
 		printf("problem with argc\n");
 		return (0);
 	}
-	argv_parser(&vars, argc, argv);
-	mutex_creator(&vars);
-
-	philos_creator(&vars);
-	
+	if (argv_parser(&vars, argc, argv) == 1)
+	{
+		
+	}
+	if (mutex_creator(&vars) == 1)
+	{
+		
+	}
+	if (philos_creator(&vars) == 1)
+	{
+		
+	}
 	ft_sleep(vars.time_to_die);
 	check_if_died(&vars);
-	sleep(1000);
 
 }
-
-
-
-//int pthread_create(*ptherad_t, const pthread_attr_t *attr, void* (*start_routine)(void*), void *arg)
-
