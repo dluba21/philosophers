@@ -52,6 +52,7 @@ void attribute_forks_to_philos(t_philo *philos, t_vars *vars)
 		pthread_mutex_init(&(philos[i].dining_mutex), NULL);
 		philos[i].min_fork = &(vars->forks[i]);
 		philos[i].fork_min = i + 1;
+		philos[i].dinner_counter = vars->dinner_number;
 		if (i != vars->number_of_philosophers - 1)
 			philos[i].max_fork = &(vars->forks[i + 1]);
 		else
