@@ -38,10 +38,11 @@ void	*philo_func(void *data)
 	while (1)
 	{
 		eating_period(philo);
-		philo->dinner_counter--;
-		if (!philo->dinner_counter)
+		if (!(--philo->dinner_counter))
 		{
-			philo->vars->not_hungry_yet++;
+			pthread_mutex_lock(&(philo->vars->dining_number_mutex));
+			++philo->vars->not_hungry_yet;
+			pthread_mutex_unlock(&(philo->vars->dining_number_mutex));
 			break ;
 		}
 		print_with_mutex("is sleeping\n", philo);
@@ -63,12 +64,8 @@ int	check_if_died(t_vars *vars)
 		while (i < n)
 		{
 			pthread_mutex_lock(&(vars->philos[i].dining_mutex));
-//			printf("|%d|", vars->not_hungry_yet);
 			if (vars->not_hungry_yet == vars->number_of_philosophers)
-			{
-				printf("all not hungry!\n");
 				return (1);
-			}
 			if (get_time_gap_from_dinner(vars->philos[i]) > vars->time_to_die)
 			{
 				print_with_mutex("thread is died\n", vars->philos + i);

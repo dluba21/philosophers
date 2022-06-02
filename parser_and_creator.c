@@ -38,6 +38,7 @@ int	mutex_creator(t_vars *vars)
 	i = 0;
 	n = vars->number_of_philosophers;
 	pthread_mutex_init(&vars->print_mutex, NULL);
+	pthread_mutex_init(&vars->dining_number_mutex, NULL);
 	vars->forks = (t_mutex *)malloc(sizeof(t_mutex) * n);
 	if (!vars->forks)
 	{

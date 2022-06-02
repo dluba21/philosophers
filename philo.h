@@ -44,13 +44,12 @@ typedef struct s_vars
 	int		time_to_eat;
 	int		time_to_sleep;
 	int		dinner_number;
-	int		not_hungry;
 	t_time	start;
 	t_mutex	*forks;
 	t_philo	*philos;
 	t_mutex	print_mutex;
+	t_mutex	dining_number_mutex;
 	int		not_hungry_yet;
-	int		counter;
 }				t_vars;
 
 int		mutex_creator(t_vars *vars);
