@@ -25,7 +25,8 @@ typedef struct timeval	t_time;
 
 typedef struct s_philo
 {
-	t_thread		pid;
+//	t_thread		pid;
+	t_thread		id;
 	
 	
 	t_time			last_dinner;
@@ -46,6 +47,7 @@ typedef struct s_vars
 	int		time_to_die; //+
 	int		time_to_eat; //+
 	int		time_to_sleep; //+
+	int		*pid_array;
 //	int		dinner_number; //semaphore n = dinner_number
 	sem_t	*dinner_numb_sem;
 	t_time	start; //before fork
@@ -56,7 +58,8 @@ typedef struct s_vars
 //	t_mutex	dining_number_mutex; //semaphore n = 1
 	sem_t	*dining_numb_bin_sem;
 //	int		not_hungry_yet; //semaphore n = 0
-	sem_t	*death_bin_sema;
+	sem_t			*dining_bin_sem; //dlya obeda. Nado li init delat' uzhe v philosophe?
+	sem_t	*death_bin_sema; //dlya smerti
 }				t_vars;
 
 int		mutex_creator(t_vars *vars);

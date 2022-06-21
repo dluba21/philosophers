@@ -62,4 +62,5 @@ void	print_with_mutex(char *str, t_philo *philo);
 int		philos_init(t_vars *vars);
 int		philos_creator(t_vars *vars);
 void	*philo_func(void *data);
+void	mutex_and_philos_destroyer(t_vars *vars);
 #endif

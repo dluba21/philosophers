@@ -29,7 +29,7 @@ int	main(int argc, char **argv)
 		return (0);
 	if (philos_creator(&vars))	
 	{
-		free(vars.philos);
+//		free(vars.philos);
 		return (0);
 	}
 	if (check_if_died(&vars))

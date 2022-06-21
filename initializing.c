@@ -50,7 +50,6 @@ int	philos_creator(t_vars *vars)
 		ret_2 = pthread_detach(vars->philos[i].id);
 		if (ret_1 || ret_2)
 		{
-			free(vars->philos);
 			printf("thread error\n");
 			return (1);
 		}

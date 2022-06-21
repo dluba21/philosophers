@@ -78,3 +78,22 @@ void	attribute_forks_to_philos(t_philo *philos, t_vars *vars)
 		i++;
 	}
 }
+
+void	mutex_and_philos_destroyer(t_vars *vars)
+{
+	int	i;
+
+	i = 0;
+//	while (i < vars->number_of_philosophers)
+//	{
+//		pthread_mutex_unlock(&(vars->forks[i]));
+//		if (pthread_mutex_destroy(&(vars->forks[i++])))
+//			printf("destroy mutex error\n");
+//	}
+//	pthread_mutex_unlock(&vars->print_mutex);
+//	pthread_mutex_unlock(&vars->dining_number_mutex);
+//	pthread_mutex_destroy(&vars->print_mutex);
+//	pthread_mutex_destroy(&vars->dining_number_mutex);
+	free(vars->forks);
+	free(vars->philos);
+}
