@@ -39,17 +39,23 @@ int	philos_creator(t_vars *vars)
 	int	i;
 	int	pid;
 
+//	attach_attributes_to_philos(vars)
+	//присвоить аттрибуты
 	i = 0;
 	while (i < vars->number_of_philosophers)
 	{
 		pid = fork();
+		if (pid == -1)
+			exit();//oshibka
 		if (pid == 0)
 		{
 			philo_func;
-			break;
 		}
-		
+		vars->philos[i].pid = pid;
+		i++;
 	}
+	while (i--)
+		waitpid(-1, NULL, 0);
 }
 
 
@@ -58,9 +64,12 @@ int	philos_and_semas_init(t_vars *vars)
 
 	if (semas_creator(t_vars *vars))
 		
-	if (philos_creator())
+	if (philos_creator(t_vars *vars))
 		
-	if (attribute_semas_to_philos)
+		//здесь надо проиницализировать все и оно скопируется в филос mainprocces
+		//надо присвоить время первой хавки и тд а уже во время форков присвоить пиды и все
+		
+	if (main_philos_process)
 		
 	
 	
