@@ -1,27 +1,34 @@
 #include "philo.h"
 
 
+
 void	eating_period(t_philo *philo)
 {
-	sem_post(philo->vars->)
-	print_with_mutex("has taken a fork\n", philo);
-	pthread_mutex_lock(philo->max_fork);
-	print_with_mutex("has taken a fork\n", philo);
-	pthread_mutex_lock(&(philo->dining_mutex));
+	sem_post(philo->vars->forks_sem);
+	print_with_sema("has taken a fork\n", philo);
+	sem_post(philo->vars->forks_sem);
+	print_with_sema("has taken a fork\n", philo);
+//	pthread_mutex_lock(&(philo->dining_mutex));
 	gettimeofday(&(philo->last_dinner), NULL);
-	pthread_mutex_unlock(&(philo->dining_mutex));
-	print_with_mutex("is eating\n", philo);
+//	pthread_mutex_unlock(&(philo->dining_mutex));
+	print_with_sema("is eating\n", philo);
 	ft_sleep(philo->vars->time_to_eat);
-	pthread_mutex_unlock(philo->min_fork);
-	pthread_mutex_unlock(philo->max_fork);
+	sem_wait(philo->vars->forks_sem);
+	sem_wait(philo->vars->forks_sem);
 }
 
-void	*routine_thread_func(void *data)
+void	*routine_philo_func(t_philo *philo)
 {
 	int		i;
-	t_philo	*philo;
 
-	philo = (t_philo *)data; //dalee ya ne uchitvayu zaderzhku philos chetnih
+	//dalee ya ne uchitvayu zaderzhku philos chetnih
+//	printf("n = %d\n", philo->n);
+//	printf("philo %d here\n", philo->n);
+//	printf("philo  here\n");
+//	printf("aboba\n");
+	if (!(philo->n % 2))
+		ft_sleep(1);
+	
 	while (1)
 	{
 		eating_period(philo);
@@ -30,34 +37,72 @@ void	*routine_thread_func(void *data)
 			++philo->vars->not_hungry_yet; //zachitit' semaphorom bin_dining_number_sema
 			break ;
 		}
-		print_with_mutex("is sleeping\n", philo);
+		print_with_sema("is sleeping\n", philo);
 		ft_sleep(philo->vars->time_to_sleep);
-		print_with_mutex("is thinking\n", philo);
+		print_with_sema("is thinking\n", philo);
 	}
 	return (NULL);
 }
 
-//void	*philo_func(void *data)
+
+
+void	*checker_thread_func(void *data)
+{
+	int		i;
+	int		n;
+	t_checker *checker_thread;
+
+	checker_thread = (t_checker *)data;
+	n = checker_thread->vars->number_of_philosophers;
+	sleep(2); //check na rabotu boobshe
+	while (1)
+	{
+		i = 0;
+		while (i < n)
+		{
+//			pthread_mutex_lock(&(vars->philos[i].dining_mutex));
+//			if (vars->not_hungry_yet == vars->number_of_philosophers)
+//				return (1);
+			if (get_time_gap_from_dinner(*checker_thread->philo) > checker_thread->vars->time_to_die)
+			{
+				print_with_sema("thread is died\n\n\n\n\n\n\n\n", checker_thread->philo);
+//				pthread_mutex_unlock(&(vars->philos[i].dining_mutex));
+//				exit (1);
+				
+//				sleep(10000);
+				
+			}
+//			pthread_mutex_unlock(&(vars->philos[i].dining_mutex));
+			i++;
+		}
+	}
+	printf("outside of checker cycle\n");
+	sleep(10000); //чтобы не выходил чекер случайно хз вдруг
+//	exit (0);
+}
+
+//int	check_if_died(t_vars *vars)
 //{
-//	int		i;
-//	t_philo	*philo;
+//	int	i;
+//	int	n;
 //
-////	philo = (t_philo *)data;
-////	if (philo->n % 2 != 0)
-////		ft_sleep(1);
+//	n = vars->number_of_philosophers;
 //	while (1)
 //	{
-//		eating_period(philo);
-//		if (!(--philo->dinner_counter))
+//		i = 0;
+//		while (i < n)
 //		{
-//			pthread_mutex_lock(&(philo->vars->dining_number_mutex));
-//			++philo->vars->not_hungry_yet;
-//			pthread_mutex_unlock(&(philo->vars->dining_number_mutex));
-//			break ;
+//			pthread_mutex_lock(&(vars->philos[i].dining_mutex));
+//			if (vars->not_hungry_yet == vars->number_of_philosophers)
+//				return (1);
+//			if (get_time_gap_from_dinner(vars->philos[i]) > vars->time_to_die)
+//			{
+//				print_with_sema("thread is died\n", vars->philos + i);
+//				pthread_mutex_unlock(&(vars->philos[i].dining_mutex));
+//				return (1);
+//			}
+//			pthread_mutex_unlock(&(vars->philos[i].dining_mutex));
+//			i++;
 //		}
-//		print_with_mutex("is sleeping\n", philo);
-//		ft_sleep(philo->vars->time_to_sleep);
-//		print_with_mutex("is thinking\n", philo);
 //	}
-//	return (NULL);
 //}

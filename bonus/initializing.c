@@ -14,64 +14,100 @@
 
 
 
-
-
-
-
-
-void	process_philos_part(t_vars *vars)
+t_philo	*each_philo_and_checker_attributing(t_vars *vars, t_checker *checker_thread) //чекер отдельный поток, а основной - сам философ
 {
-
+	t_philo	*philo;
 	
-	ret_1 = pthread_create(&philo->id, NULL, routine_thread_func, \
-			(void *)philo);
-	ret_2 = pthread_detach(&philo->id);
+	philo = malloc(sizeof(t_philo));  //nado izbavitsya ot malloca
+	if (!philo)
+	{
+		printf("philo malloc error\n");
+		exit(1);
+	}
+	philo->vars = vars;
+	philo->n = vars->current_philo_number;
+	if (vars->dinner_number)
+		philo->dinner_counter = vars->dinner_number;
+	ft_sleep(2);
+	gettimeofday(&vars->start, NULL);
+	return (philo);
+}
+
+
+
+int	process_philos_part(t_vars *vars)
+{
+	int			ret_1;
+	int			ret_2;
+	t_checker	*checker_thread;
+	t_philo		*philo;
+	
+	philo = each_philo_and_checker_attributing(vars, checker_thread); //nado izbavitsya ot malloca
+	checker_thread->vars = vars;
+	checker_thread->philo = philo;
+	
+	ret_1 = pthread_create(&checker_thread->id, NULL, checker_thread_func, \
+			(void *)checker_thread);
+	ret_2 = pthread_detach(checker_thread->id);
 	if (ret_1 || ret_2)
 	{
 		printf("thread error\n");
 		return (1);
 	}
+	routine_philo_func(philo);
+	return (0);
 }
 
-void	each_philo_thread_attribute(t_vars *vars) //присваивание аттрибутов философу - треду, а сам процесс пусть и чекает, точнее основной поток процесса ребенка
-{
-	t_philo	*philo;
 
-	philo->vars = vars;
-	if (vars->dinner_counter)
-		philo->dinner_counter = vars->dinner_counter;
-}
+
+
+
+
+//void	process_philos_part(t_vars *vars) //это если философ-поток в потоке отдельном
+//{
+//
+//
+//	ret_1 = pthread_create(&philo->id, NULL, routine_thread_func, \
+//			(void *)philo);
+//	ret_2 = pthread_detach(&philo->id);
+//	if (ret_1 || ret_2)
+//	{
+//		printf("thread error\n");
+//		return (1);
+//	}
+//}
+
+//это если философ-поток в потоке отдельном
+//void	each_philo_thread_attribute(t_vars *vars) //присваивание аттрибутов философу - треду, а сам процесс пусть и чекает, точнее основной поток процесса ребенка
+//{
+//	t_philo	*philo;
+//
+//	philo->vars = vars;
+//	if (vars->dinner_counter)
+//		philo->dinner_counter = vars->dinner_counter;
+//}
 
 int	semas_creator(t_vars *vars)
 {
 	
-//	sem_t	*dinner_numb_sem; //lishniy ne nado peredelivat bilo
-//	t_time	start; //before fork
-//	t_mutex	*forks; //
-//	t_philo	*philos;
-////	t_mutex	print_mutex; //semaphore n = 1
-//	sem_t	*print_bin_sem;
-////	t_mutex	dining_number_mutex; //semaphore n = 1
-//	sem_t	*dining_numb_bin_sem;
-////	int		not_hungry_yet; //semaphore n = 0
-//	sem_t	*death_bin_sem;
 	
-	vars->forks_sem = sem_open("/sem_1", O_CREAT | O_EXCEL, 0666, vars->number_of_philosophers);
-	vars->print_bin_sem = sem_open("/sem_2", O_CREAT | O_EXCEL, 0666, 1);
-	vars->dining_numb_bin_sem = sem_open("/sem_3", O_CREAT | O_EXCEL, 0666, 1);
-	vars->death_bin_sem = sem_open("/sem_4", O_CREAT | O_EXCEL, 0666, 1);
+	vars->forks_sem = sem_open("/sem_1", O_CREAT, 0666, vars->number_of_philosophers); //посмотреть как O_EXCL работает
+	vars->print_bin_sem = sem_open("/sem_2", O_CREAT, 0666, 1);
+	vars->dinner_numb_bin_sem = sem_open("/sem_3", O_CREAT, 0666, 1);
+	vars->death_bin_sem = sem_open("/sem_4", O_CREAT, 0666, 1);
+//	printf("%d\n", (int)vars->forks_sem);
+//	printf("%d\n",  (int)vars->print_bin_sem);
+//	printf("%d\n", (int)vars->dinner_numb_bin_sem);
+//	printf("%d\n", (int)vars->death_bin_sem);
+//
 	if (vars->forks_sem == SEM_FAILED || vars->print_bin_sem == SEM_FAILED \
-		|| vars->dining_numb_bin_sem == SEM_FAILED || vars->death_bin_sem == SEM_FAILED)
+		|| vars->dinner_numb_bin_sem == SEM_FAILED || vars->death_bin_sem == SEM_FAILED)
 		return (1);
 	return (0);
 }
 
-//int attach_attributes_to_philos(t_vars *vars)
-//{
-//	vars->
-//}
 
-int	philos_creator(t_vars *vars)
+int	process_philos_creator(t_vars *vars)
 {
 	int	i;
 	int	pid;
@@ -83,7 +119,7 @@ int	philos_creator(t_vars *vars)
 		return (1);
 	}
 	
-	each_philo_thread_attribute(vars); //присвоить аттрибуты общему философу единственное отличие в номере филосоофа который передаю через счетчик
+//	each_philo_thread_attribute(vars); //присвоить аттрибуты общему философу единственное отличие в номере филосоофа который передаю через счетчик
 	
 	i = 0;
 	while (i < vars->number_of_philosophers)
@@ -93,34 +129,43 @@ int	philos_creator(t_vars *vars)
 			return (1);
 		if (pid == 0)
 		{
-			philo->n = i; //узнаю номер философа
+			
+//			printf("child %d started\n", i);
+			
+			
+			vars->current_philo_number = i; //узнаю номер философа
 			process_philos_part(vars);
 		}
+		printf("%d - %d\n", i, pid);
 		vars->pid_array[i] = pid;
 		i++;
 	}
+	
+	printf("main process is sleeping\n");
+	sleep(1000);
+	
 	while (i--) //i--???
 		waitpid(-1, NULL, 0);
+	return (0);
 }
 
 
 int	philos_and_semas_init(t_vars *vars)
 {
 
-	if (semas_creator(t_vars *vars))
+	if (semas_creator(vars))
 	{
 		printf("semas init error\n");
-		exit();
+		exit (1);
 	}
-	
-	if (philos_creator(t_vars *vars))
-		
+	if (process_philos_creator(vars))
+	{
+		printf("process_philos_creator error\n");
+		exit (1);
+	}
 		//здесь надо проиницализировать все и оно скопируется в филос mainprocces
 		//надо присвоить время первой хавки и тд а уже во время форков присвоить пиды и все
-		
-	if (main_philos_process)
-		
-	
+	return (0);
 	
 }
 
@@ -128,45 +173,7 @@ int	philos_and_semas_init(t_vars *vars)
 
 
 
-long	ft_time(void)
-{
-	struct timeval	tv;
-	long			res;
 
-	gettimeofday(&tv, NULL);
-	res = 1000 * (size_t)tv.tv_sec + (size_t)tv.tv_usec / 1000;
-	return (res);
-}
-
-void	ft_sleep(long ms)
-{
-	long	time;
-
-	time = ft_time();
-	usleep(ms * 850);
-	while (ft_time() < time + ms)
-		usleep(ms * 3);
-}
-
-long	get_time_gap_from_start(t_vars *vars)
-{
-	t_time	now;
-
-	gettimeofday(&now, NULL);
-	return (now.tv_sec * 1000 + now.tv_usec / 1000 - \
-			(vars->start.tv_sec * 1000 + \
-			vars->start.tv_usec / 1000));
-}
-
-long	get_time_gap_from_dinner(t_philo philo)
-{
-	t_time	now;
-
-	gettimeofday(&now, NULL);
-	return (now.tv_sec * 1000 + now.tv_usec / 1000 - \
-			(philo.last_dinner.tv_sec * 1000 + \
-			philo.last_dinner.tv_usec / 1000));
-}
 
 
 

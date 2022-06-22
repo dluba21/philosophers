@@ -27,14 +27,14 @@ int	main(int argc, char **argv)
 	
 	if (philos_and_semas_init(&vars))
 		return (0);
-	if (philos_creator(&vars))	
+	if (process_philos_creator(&vars))	
 	{
 //		free(vars.philos);
 		return (0);
 	}
-	if (check_if_died(&vars))
-	{
-		free(vars.philos);
-		return (0);
-	}
+//	if (check_if_died(&vars))
+//	{
+//		free(vars.philos);
+//		return (0);
+//	}
 }
