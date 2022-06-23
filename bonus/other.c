@@ -2,10 +2,10 @@
 
 void print_with_sema(char *str, t_philo *philo) //интересно, зависит ли скорость от того передам ли я философа всего большого или номер только
 {
-	sem_post(philo->vars->print_bin_sem);
+	sem_wait(philo->vars->print_bin_sem);
 	printf("%ld %d %s", get_time_gap_from_start(philo->vars), \
 			philo->n + 1, str);
-	sem_wait(philo->vars->print_bin_sem);
+	sem_post(philo->vars->print_bin_sem);
 	
 }
 

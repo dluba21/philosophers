@@ -4,17 +4,17 @@
 
 void	eating_period(t_philo *philo)
 {
-	sem_post(philo->vars->forks_sem);
+	sem_wait(philo->vars->forks_sem);
 	print_with_sema("has taken a fork\n", philo);
-	sem_post(philo->vars->forks_sem);
+	sem_wait(philo->vars->forks_sem);
 	print_with_sema("has taken a fork\n", philo);
 //	pthread_mutex_lock(&(philo->dining_mutex));
 	gettimeofday(&(philo->last_dinner), NULL);
 //	pthread_mutex_unlock(&(philo->dining_mutex));
 	print_with_sema("is eating\n", philo);
 	ft_sleep(philo->vars->time_to_eat);
-	sem_wait(philo->vars->forks_sem);
-	sem_wait(philo->vars->forks_sem);
+	sem_post(philo->vars->forks_sem);
+	sem_post(philo->vars->forks_sem);
 }
 
 void	*routine_philo_func(t_philo *philo)
@@ -26,8 +26,8 @@ void	*routine_philo_func(t_philo *philo)
 //	printf("philo %d here\n", philo->n);
 //	printf("philo  here\n");
 //	printf("aboba\n");
-	if (!(philo->n % 2))
-		ft_sleep(1);
+	if ((philo->n + 1) % 2 == 0) // четные задерживаются
+		ft_sleep(5);
 	
 	while (1)
 	{
@@ -54,7 +54,8 @@ void	*checker_thread_func(void *data)
 
 	checker_thread = (t_checker *)data;
 	n = checker_thread->vars->number_of_philosophers;
-	sleep(2); //check na rabotu boobshe
+//	sleep(2); //check na rabotu boobshe
+	ft_sleep(400);
 	while (1)
 	{
 		i = 0;
@@ -65,6 +66,8 @@ void	*checker_thread_func(void *data)
 //				return (1);
 			if (get_time_gap_from_dinner(*checker_thread->philo) > checker_thread->vars->time_to_die)
 			{
+				printf("\n\n\n\n\ngap = %lu\n", get_time_gap_from_dinner(*checker_thread->philo));
+				printf("time_to_die = %d\n", checker_thread->vars->time_to_die);
 				print_with_sema("thread is died\n\n\n\n\n\n\n\n", checker_thread->philo);
 //				pthread_mutex_unlock(&(vars->philos[i].dining_mutex));
 //				exit (1);
@@ -77,7 +80,7 @@ void	*checker_thread_func(void *data)
 		}
 	}
 	printf("outside of checker cycle\n");
-	sleep(10000); //чтобы не выходил чекер случайно хз вдруг
+//	sleep(10000); //чтобы не выходил чекер случайно хз вдруг
 //	exit (0);
 }
 

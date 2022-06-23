@@ -95,6 +95,12 @@ int	semas_creator(t_vars *vars)
 	vars->print_bin_sem = sem_open("/sem_2", O_CREAT, 0666, 1);
 	vars->dinner_numb_bin_sem = sem_open("/sem_3", O_CREAT, 0666, 1);
 	vars->death_bin_sem = sem_open("/sem_4", O_CREAT, 0666, 1);
+	
+	sem_unlink("/sem_1");
+	sem_unlink("/sem_2");
+	sem_unlink("/sem_3");
+	sem_unlink("/sem_4");
+	
 //	printf("%d\n", (int)vars->forks_sem);
 //	printf("%d\n",  (int)vars->print_bin_sem);
 //	printf("%d\n", (int)vars->dinner_numb_bin_sem);
@@ -136,13 +142,13 @@ int	process_philos_creator(t_vars *vars)
 			vars->current_philo_number = i; //узнаю номер философа
 			process_philos_part(vars);
 		}
-		printf("%d - %d\n", i, pid);
+//		printf("%d - %d\n", i, pid);
 		vars->pid_array[i] = pid;
 		i++;
 	}
 	
 	printf("main process is sleeping\n");
-	sleep(1000);
+//	sleep(1000);
 	
 	while (i--) //i--???
 		waitpid(-1, NULL, 0);
