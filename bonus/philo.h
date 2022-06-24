@@ -78,6 +78,7 @@ typedef struct s_vars
 	sem_t	*dinner_numb_bin_sem;
 	sem_t	*dinner_bin_sem; //dlya obeda. Nado li init delat' uzhe v philosophe?
 	sem_t	*death_bin_sem; //dlya smerti
+	sem_t	*first_dinner_sem;
 }				t_vars;
 
 //int		mutex_creator(t_vars *vars);
@@ -110,3 +111,13 @@ void	*routine_philo_func(t_philo *philo);
 void	*checker_thread_func(void *data);
 
 #endif
+
+
+
+
+
+
+
+
+
+// if g_all.n_of_philos > 200)

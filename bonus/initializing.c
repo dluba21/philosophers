@@ -28,8 +28,9 @@ t_philo	*each_philo_and_checker_attributing(t_vars *vars, t_checker *checker_thr
 	philo->n = vars->current_philo_number;
 	if (vars->dinner_number)
 		philo->dinner_counter = vars->dinner_number;
-	ft_sleep(2);
-	gettimeofday(&vars->start, NULL);
+	ft_sleep(5);
+//	usleep(100);
+//	gettimeofday(&vars->start, NULL);
 	return (philo);
 }
 
@@ -91,15 +92,17 @@ int	semas_creator(t_vars *vars)
 {
 	
 	
-	vars->forks_sem = sem_open("/sem_1", O_CREAT, 0666, vars->number_of_philosophers); //посмотреть как O_EXCL работает
-	vars->print_bin_sem = sem_open("/sem_2", O_CREAT, 0666, 1);
-	vars->dinner_numb_bin_sem = sem_open("/sem_3", O_CREAT, 0666, 1);
-	vars->death_bin_sem = sem_open("/sem_4", O_CREAT, 0666, 1);
+	vars->forks_sem = sem_open("/sem_1", O_CREAT | O_EXCL, 0666, vars->number_of_philosophers); //посмотреть как O_EXCL работает
+	vars->print_bin_sem = sem_open("/sem_2", O_CREAT | O_EXCL, 0666, 1);
+	vars->dinner_numb_bin_sem = sem_open("/sem_3", O_CREAT | O_EXCL, 0666, 1);
+	vars->death_bin_sem = sem_open("/sem_4", O_CREAT | O_EXCL, 0666, 1);
+	vars->first_dinner_sem = sem_open("/sem_5", O_CREAT | O_EXCL, 0666, 0);
 	
 	sem_unlink("/sem_1");
 	sem_unlink("/sem_2");
 	sem_unlink("/sem_3");
 	sem_unlink("/sem_4");
+	sem_unlink("/sem_5");
 	
 //	printf("%d\n", (int)vars->forks_sem);
 //	printf("%d\n",  (int)vars->print_bin_sem);
@@ -128,6 +131,7 @@ int	process_philos_creator(t_vars *vars)
 //	each_philo_thread_attribute(vars); //присвоить аттрибуты общему философу единственное отличие в номере филосоофа который передаю через счетчик
 	
 	i = 0;
+	gettimeofday(&vars->start, NULL);
 	while (i < vars->number_of_philosophers)
 	{
 		pid = fork();

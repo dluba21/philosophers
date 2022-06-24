@@ -8,6 +8,7 @@ void	eating_period(t_philo *philo)
 	print_with_sema("has taken a fork\n", philo);
 	sem_wait(philo->vars->forks_sem);
 	print_with_sema("has taken a fork\n", philo);
+//	sem_post(philo->vars->first_dinner_sem);
 //	pthread_mutex_lock(&(philo->dining_mutex));
 	gettimeofday(&(philo->last_dinner), NULL);
 //	pthread_mutex_unlock(&(philo->dining_mutex));
@@ -27,10 +28,11 @@ void	*routine_philo_func(t_philo *philo)
 //	printf("philo  here\n");
 //	printf("aboba\n");
 	if ((philo->n + 1) % 2 == 0) // четные задерживаются
-		ft_sleep(5);
+		usleep(1000 * (philo->vars->time_to_die * 0.5));
 	
 	while (1)
 	{
+		
 		eating_period(philo);
 		if (!(--philo->dinner_counter))
 		{
@@ -55,7 +57,10 @@ void	*checker_thread_func(void *data)
 	checker_thread = (t_checker *)data;
 	n = checker_thread->vars->number_of_philosophers;
 //	sleep(2); //check na rabotu boobshe
-	ft_sleep(400);
+//	ft_sleep(1500);
+//	sem_wait(checker_thread->vars->first_dinner_sem);
+//	printf("checker has started\n");
+	ft_sleep(500);
 	while (1)
 	{
 		i = 0;
@@ -64,6 +69,7 @@ void	*checker_thread_func(void *data)
 //			pthread_mutex_lock(&(vars->philos[i].dining_mutex));
 //			if (vars->not_hungry_yet == vars->number_of_philosophers)
 //				return (1);
+			ft_sleep(1);
 			if (get_time_gap_from_dinner(*checker_thread->philo) > checker_thread->vars->time_to_die)
 			{
 				printf("\n\n\n\n\ngap = %lu\n", get_time_gap_from_dinner(*checker_thread->philo));
