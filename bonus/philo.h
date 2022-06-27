@@ -18,7 +18,9 @@
 # include <pthread.h>
 # include <sys/time.h>
 # include <semaphore.h>
+# include <signal.h>
 # include "libft/libft.h"
+
 
 typedef pthread_mutex_t	t_mutex;
 typedef pthread_t		t_thread;

@@ -46,6 +46,7 @@ int	process_philos_part(t_vars *vars)
 	philo = each_philo_and_checker_attributing(vars, checker_thread); //nado izbavitsya ot malloca
 	checker_thread->vars = vars;
 	checker_thread->philo = philo;
+
 	
 	ret_1 = pthread_create(&checker_thread->id, NULL, checker_thread_func, \
 			(void *)checker_thread);
@@ -95,14 +96,14 @@ int	semas_creator(t_vars *vars)
 	vars->forks_sem = sem_open("/sem_1", O_CREAT | O_EXCL, 0666, vars->number_of_philosophers); //посмотреть как O_EXCL работает
 	vars->print_bin_sem = sem_open("/sem_2", O_CREAT | O_EXCL, 0666, 1);
 	vars->dinner_numb_bin_sem = sem_open("/sem_3", O_CREAT | O_EXCL, 0666, 1);
-	vars->death_bin_sem = sem_open("/sem_4", O_CREAT | O_EXCL, 0666, 1);
-	vars->first_dinner_sem = sem_open("/sem_5", O_CREAT | O_EXCL, 0666, 0);
+	vars->death_bin_sem = sem_open("/sem_4", O_CREAT | O_EXCL, 0666, 10);
+//	vars->first_dinner_sem = sem_open("/sem_5", O_CREAT | O_EXCL, 0666, 0);
 	
 	sem_unlink("/sem_1");
 	sem_unlink("/sem_2");
 	sem_unlink("/sem_3");
 	sem_unlink("/sem_4");
-	sem_unlink("/sem_5");
+//	sem_unlink("/sem_5");
 	
 //	printf("%d\n", (int)vars->forks_sem);
 //	printf("%d\n",  (int)vars->print_bin_sem);
@@ -120,7 +121,9 @@ int	process_philos_creator(t_vars *vars)
 {
 	int	i;
 	int	pid;
+	int	status;
 	
+	status = -1;
 	vars->pid_array = malloc(sizeof(int) * vars->number_of_philosophers);
 	if (!vars->pid_array)
 	{
@@ -151,11 +154,42 @@ int	process_philos_creator(t_vars *vars)
 		i++;
 	}
 	
-	printf("main process is sleeping\n");
-//	sleep(1000);
+	printf("main process      [%d] is sleeping\n", getpid());
 	
-	while (i--) //i--???
-		waitpid(-1, NULL, 0);
+//	sleep(10);
+//	printf("\n\n\nwant to kill\n\n\n\n");
+	while (i)
+	{
+	
+		waitpid(-1, &status, 0);
+		if (WEXITSTATUS(status) == 0) //0 dlya obeda
+		{
+//			printf("\n[status_of_dinner numb = %d]\n", status);
+//				printf("i = %d\n", i);
+			i--;
+		}
+		else if (WEXITSTATUS(status) == 1) //1 dlya smerti
+		{
+			printf("\n[status_of_dying = %d]\n", status);
+			break;
+		}
+			
+	}
+//	sem_wait(philo->vars->vars->death_bin_sem);
+	printf("before kill!!!\n\n\n");
+	i = 0;
+	while (i < vars->number_of_philosophers)
+		kill(vars->pid_array[i++], SIGKILL);
+
+	printf("the end!!!\n");
+//	sleep(10);
+//	while (i--) //i--???
+//		waitpid(-1, NULL, 0);
+	sleep(10);
+	exit(1);
+//	printf("\n|\n|\n|\n|\n|\n");
+//	printf("make return of process pid = %d\n", getpid());
+
 	return (0);
 }
 
@@ -181,63 +215,3 @@ int	philos_and_semas_init(t_vars *vars)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-//
-//
-//
-//void	print_with_mutex(char *str, t_philo *philo)
-//{
-//	pthread_mutex_lock(&(philo->vars->print_mutex));
-//	printf("%ld %d %s", get_time_gap_from_start(philo->vars), \
-//			philo->n + 1, str);
-//	pthread_mutex_unlock(&(philo->vars->print_mutex));
-//}
-//
-//int	philos_init(t_vars *vars)
-//{
-//	vars->philos = (t_philo *)malloc(sizeof(t_philo) * \
-//					vars->number_of_philosophers);
-//	if (!vars->philos)
-//	{
-//		printf("thread creating error: can't malloc\n");
-//		return (1);
-//	}
-//	attribute_forks_to_philos(vars->philos, vars);
-//	return (0);
-//}
-//
-//int	philos_creator(t_vars *vars)
-//{
-//	int	ret_1;
-//	int	ret_2;
-//	int	i;
-//
-//	i = 0;
-//	if (philos_init(vars))
-//		return (1);
-//	gettimeofday(&(vars->start), NULL);
-//	while (i < vars->number_of_philosophers)
-//	{
-//		ret_1 = pthread_create(&(vars->philos[i].id), NULL, philo_func, \
-//				(void *)&(vars->philos[i]));
-//		ret_2 = pthread_detach(vars->philos[i].id);
-//		if (ret_1 || ret_2)
-//		{
-//			free(vars->philos);
-//			printf("thread error\n");
-//			return (1);
-//		}
-//		i++;
-//	}
-//	return (0);
-//}

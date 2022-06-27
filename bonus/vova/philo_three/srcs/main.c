@@ -25,7 +25,7 @@ int	ph_life(t_ph *philo)
 	usleep(g_all.t_to_eat * 1000);
 	philo->eat_count++;
 	if (philo->eat_count == g_all.nt_must_eat)
-		ph_print("\033[0;31m\033[1mdied \033[0m", philo->number, 0);
+		ph_print("\033[0;31m\033[1mdied \033[0m", philo->number, 0); //loooool
 	sem_post(g_all.forks);
 	sem_post(g_all.forks);
 	ph_print("is sleeping", philo->number, 1);
