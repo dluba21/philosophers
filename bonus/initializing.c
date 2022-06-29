@@ -96,7 +96,7 @@ int	semas_creator(t_vars *vars)
 	vars->forks_sem = sem_open("/sem_1", O_CREAT | O_EXCL, 0666, vars->number_of_philosophers); //посмотреть как O_EXCL работает
 	vars->print_bin_sem = sem_open("/sem_2", O_CREAT | O_EXCL, 0666, 1);
 	vars->dinner_numb_bin_sem = sem_open("/sem_3", O_CREAT | O_EXCL, 0666, 1);
-	vars->death_bin_sem = sem_open("/sem_4", O_CREAT | O_EXCL, 0666, 10);
+	vars->death_bin_sem = sem_open("/sem_4", O_CREAT | O_EXCL, 0666, 2);
 //	vars->first_dinner_sem = sem_open("/sem_5", O_CREAT | O_EXCL, 0666, 0);
 	
 	sem_unlink("/sem_1");
@@ -135,6 +135,7 @@ int	process_philos_creator(t_vars *vars)
 	
 	i = 0;
 	gettimeofday(&vars->start, NULL);
+	vars->start.tv_usec += 5000; //убираю погрешность в начале почтии в 5 милисекунд
 	while (i < vars->number_of_philosophers)
 	{
 		pid = fork();
@@ -145,7 +146,7 @@ int	process_philos_creator(t_vars *vars)
 			
 //			printf("child %d started\n", i);
 			
-			
+//			sleep(1000);
 			vars->current_philo_number = i; //узнаю номер философа
 			process_philos_part(vars);
 		}
@@ -153,11 +154,14 @@ int	process_philos_creator(t_vars *vars)
 		vars->pid_array[i] = pid;
 		i++;
 	}
+	printf("i = %d\n", i);
+	
 	
 	printf("main process      [%d] is sleeping\n", getpid());
 	
 //	sleep(10);
 //	printf("\n\n\nwant to kill\n\n\n\n");
+	printf("make return of process pid_1 = %d\n", getpid());
 	while (i)
 	{
 	
@@ -170,26 +174,27 @@ int	process_philos_creator(t_vars *vars)
 		}
 		else if (WEXITSTATUS(status) == 1) //1 dlya smerti
 		{
-			printf("\n[status_of_dying = %d]\n", status);
+//			printf("\n[status_of_dying = %d]\n", status);
 			break;
 		}
 			
 	}
+	printf("make return of process pid_2 = %d\n", getpid());
 //	sem_wait(philo->vars->vars->death_bin_sem);
-	printf("before kill!!!\n\n\n");
+//	printf("before kill!!!\n\n\n");
 	i = 0;
 	while (i < vars->number_of_philosophers)
 		kill(vars->pid_array[i++], SIGKILL);
-
-	printf("the end!!!\n");
+	free(vars->pid_array);
+//	printf("the end!!!\n");
 //	sleep(10);
 //	while (i--) //i--???
 //		waitpid(-1, NULL, 0);
-	sleep(10);
-	exit(1);
+//	sleep(1);
+//	exit(1);
 //	printf("\n|\n|\n|\n|\n|\n");
-//	printf("make return of process pid = %d\n", getpid());
 
+	printf("make return of process pid_3 = %d\n", getpid());
 	return (0);
 }
 
