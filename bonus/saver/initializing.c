@@ -134,6 +134,42 @@ int	process_philos_creator(t_vars *vars)
 //	each_philo_thread_attribute(vars); //присвоить аттрибуты общему философу единственное отличие в номере филосоофа который передаю через счетчик
 	
 	i = 0;
+//
+
+	
+//==46158== HEAP SUMMARY:
+//==46158==     in use at exit: 23,245 bytes in 167 blocks
+//==46158==   total heap usage: 188 allocs, 21 frees, 31,693 bytes allocated
+//==46158==
+//==46158== LEAK SUMMARY:
+//==46158==    definitely lost: 16 bytes in 1 blocks
+//==46158==    indirectly lost: 0 bytes in 0 blocks
+//==46158==      possibly lost: 8,840 bytes in 7 blocks
+//==46158==    still reachable: 14,389 bytes in 159 blocks
+//==46158==         suppressed: 0 bytes in 0 blocks
+//==46158== Rerun with --leak-check=full to see details of leaked memory
+//==46158==
+//==46158== For lists of detected and suppressed errors, rerun with: -s
+//==46158== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 398 from 10)
+	
+//==46525== HEAP SUMMARY:
+//==46525==     in use at exit: 23,229 bytes in 166 blocks
+//==46525==   total heap usage: 188 allocs, 22 frees, 31,693 bytes allocated
+//==46525==
+//==46525== LEAK SUMMARY:
+//==46525==    definitely lost: 0 bytes in 0 blocks
+//==46525==    indirectly lost: 0 bytes in 0 blocks
+//==46525==      possibly lost: 8,840 bytes in 7 blocks
+//==46525==    still reachable: 14,389 bytes in 159 blocks
+//==46525==         suppressed: 0 bytes in 0 blocks
+//==46525== Rerun with --leak-check=full to see details of leaked memory
+//==46525==
+//==46525== For lists of detected and suppressed errors, rerun with: -s
+
+	
+	
+	
+	
 	gettimeofday(&vars->start, NULL);
 	vars->start.tv_usec += 5000; //убираю погрешность в начале почтии в 5 милисекунд
 	while (i < vars->number_of_philosophers)
@@ -188,12 +224,19 @@ int	process_philos_creator(t_vars *vars)
 	free(vars->pid_array);
 	
 
-//	printf("ret_2 = %d\n", sem_close(vars->forks_sem));
-//	printf("ret_2 = %d\n", sem_close(vars->print_bin_sem));
-//	printf("ret_2 = %d\n", sem_close(vars->dinner_numb_bin_sem));
-//	printf("ret_2 = %d\n", sem_close(vars->death_bin_sem));
+	while (i--) //i--???
+		waitpid(-1, NULL, 0);
+//	sleep(300);
+
+
 	
+
+	printf("ret_2 = %d\n", sem_close(vars->forks_sem));
+	printf("ret_2 = %d\n", sem_close(vars->print_bin_sem));
+	printf("ret_2 = %d\n", sem_close(vars->dinner_numb_bin_sem));
+	printf("ret_2 = %d\n", sem_close(vars->death_bin_sem));
 	
+
 	return (0);
 }
 

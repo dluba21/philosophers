@@ -73,10 +73,7 @@ void	*checker_thread_func(void *data)
 				print_with_sema("thread is died\n\n\n\n\n", checker_thread->philo);
 				free(checker_thread->vars->pid_array);
 				free(checker_thread->philo);
-				
-//				printf("\t\t\t\t\tPID OF DIED MAN = [%d]\n\n\n", getpid());
 //				sleep(1000);
-				
 				exit (1);
 	
 				
