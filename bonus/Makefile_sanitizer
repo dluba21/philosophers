@@ -1,4 +1,0 @@
-all:
-	gcc *.c libft/libft.a -fsanitize=thread -g -o philo
-clean:
-	rm *.o philo
